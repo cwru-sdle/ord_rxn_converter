@@ -1,0 +1,17 @@
+Metadata-Version: 2.4
+Name: ord_rxn_converter
+Version: 0.1.1
+Summary: Package for extracting chemical reaction serialized (Google Protocol Buffers mechanism) in Open Reaction Database (ORD) schema to relational database (RDB) and Resource Descriptive Framework (RDF).
+Author-email: "Quynh D. Tran" <qdt@case.edu>
+License-Expression: MIT
+Project-URL: Homepage, https://github.com/cwru-sdle/ord_rxn_converter
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: ord_schema
+Requires-Dist: protobuf
+Requires-Dist: pandas
+Requires-Dist: rdkit
+Dynamic: license-file
