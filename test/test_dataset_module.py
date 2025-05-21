@@ -5,7 +5,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..',
 
 from ord_rxn_converter import dataset_module
 
-path = '/mnt/vstor/CSE_MSE_RXF131/cradle-members/mds3/qdt/git/kg_chem_synthesis/ord_rxn_converter/test/data'
+path = '~ ord_rxn_converter/test/data' # relative path only 
 
 file_list = []
 for root, dirs, files in os.walk(path):

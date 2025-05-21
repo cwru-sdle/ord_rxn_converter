@@ -2,7 +2,7 @@
 from ord_schema.proto import dataset_pb2, reaction_pb2
 from google.protobuf.message import Message
 from uuid import uuid4
-from ord_rxn_converter.utility_functions import extract_all_enums
+from ord_rxn_converter.utility_functions_module import extract_all_enums
 from ord_rxn_converter.identifiers_module import extract_compound_identifiers, generate_compound_table
 
 #generate enums_data to be accessible here TODO - have importable object instead..?
@@ -11,34 +11,27 @@ enums_data = extract_all_enums(reaction_pb2)
 def extract_reaction_outcomes(reactionID, outcomes): 
 
     """
-    Description: 
-        Takes a reaction outcome object (in Google Protobuf message type based on ORD structure schema) & return a list of outcomes: 
-            reaction time: for flow, equivalent to residence time or spacetime
-            reaction time unit
-            percentage conversion
-            product information:
-                identifiers
-                measurements
-                texture
-                features, etc.
-            analyses
+    Extracts outcome information from ORD reaction data.
 
-    Algorithm:
-        1. Initialize empty lists to hold reaction outcomes
-        2. Loop through each outcome
-        3. For each product in an outcome, extract product data
-        4. For each product, extract analysis data
-        5. If analysis data exists, append all values to reaction outcomes list
-        6. Otherwise, append all values to reaction outcomes list and analysis values to 'None' 
-    
-    Args: 
-        outcomes:
-            Outcomes from a reaction 
+    Takes a reaction outcome object (in Google Protobuf message type based on
+    ORD structure schema) and extracts data about reaction outcomes
+    including reaction time, conversion percentages, product information, and
+    analytical data.
 
-    Returns: 
-        list:
-            A list of outcome information from a reaction
+    Args:
+        reactionID (str): Unique identifier for the reaction.
+        outcomes (list): List of outcome objects from a reaction, containing
+            reaction time, conversion, products, and analyses data.
+
+    Returns:
+        tuple: A tuple containing two elements:
+            outcomes_list (list): A list of lists, where each inner list contains:
+                [reactionID, outcomeKey, reaction_time_value, time_unit, 
+                conversion_value, products_list, analyses_list]
+            outcome_identifiers (list): A list of compound identifiers associated
+                with the reaction outcomes, or None if no products are present.
     """
+
     outcomes_list = []
     outcome_identifiers = []
     outcome_measurements = []
@@ -71,44 +64,25 @@ def extract_reaction_outcomes(reactionID, outcomes):
     return outcomes_list, outcome_identifiers
 
 def extract_product (products):
-    """"
-    Description: Takes in products and outcome key and extracts products and measurents of a reaction outcome and compounds in a reaction: 
-        product measurements
-        products_list: 
-            outcomeKey
-            identifier list
-            is desired product
-            measurement keys  
-            isolated color,
-            texture
-            feature dict
-            reaction role
-        compound table
-
-    Algorithm: 
-        1. Initialize products_list to store all of the products 
-        2. Initialize products_measurements to store measurements of all of the products 
-        3. Initialize compound_table to hold compound information
-        4. Iterate through each product in products: 
-            a. Extract all of the identifiers into a list # TODO: somehow need to add the product identifiers into the compound table 
-            b. Append compound identifiers to compound_table
-            c. Extract the measurements by calling the extract_product_measurements function with measurements as the argument
-                - This returns a list of measurement_keys to cross-refernce between the two tables (outcome vs measurements)
-            d. Append all of the measurement lists into a list for ALL of the products' measurements (products_measurements)
-            e. Extract texture, features, and reaction role
-        5. Append of all of the fields into products_list
-        6. Return the products_list, the products_measurements and the compound_table
-
-    Args: 
-        products: 
-            Products of a reaction
-        outcomeKey:
-            Unique key of a reaction outcome
-
-    Returns: 
-        list:
-            A list of reaction products, measurements, and compounds 
     """
+    Extracts product data and related measurements from ORD product objects.
+
+    Takes product objects from a reaction outcome and extracts information
+    including identifiers, measurements, textures, features, and reaction roles.
+    Also generates compound tables with standardized identifiers.
+
+    Args:
+        products (list): List of product objects from a reaction outcome.
+
+    Returns:
+        tuple: A tuple containing two elements:
+            products_list (list): A list of lists, where each inner list contains:
+                [inchi_key, is_desired_product, products_measurements, isolated_color,
+                product_texture, feature_dict, reaction_role]
+            compound_identifiers (list): A list of compound tables containing
+                standardized compound identifiers for all products.
+    """
+
     products_list = []
     products_measurements = []
     compound_identifiers = []
@@ -159,42 +133,22 @@ def extract_product (products):
 
 def extract_product_measurements(measurements):
     """
-    Description: Takes in measurements and extracts the measurements of reaction outcomes:
-        measurement key
-        analysis key
-        measurement type
-        measurement details
-        measurement uses internal standard,
-        measurement is normalized
-        measurement uses authentic standard
-        compound authentic
-        measurement value
-        retention time
-        time unit
-        mass spec type
-        mass spec details
-        tic minimum
-        tic maximum
-        eic masses 
-        selectivity
-        wavelength
-        wavelength unit
+    Extracts measurement data from ORD product measurements.
 
-    Algorithm:
-        1. Create empty lists for measurements and measurement keys
-        2. Loop through each measurement
-        3. Set unique measurement keys and append to key list
-        4. Extract measurement information if available 
-        5. Append measurement information to measurement list
+    Processes measurement objects to extract analytical data 
+    including measurement types, values, spectroscopic details, and chromatographic
+    information.
 
-    Args: 
-        measurements:
-            Measurements of reaction 
-    
+    Args:
+        measurements (list): List of measurement objects associated with a product.
+
     Returns:
-        list:
-            A list of measurment information for reaction outcomes
-
+        list: A list of lists, where each inner list contains measurement data:
+            [analysis_key, measurement_type, details, uses_internal_standard,
+            is_normalized, uses_authentic_standard, compound_authentic, 
+            measurement_value, retention_time, time_unit, mass_spec_type,
+            mass_spec_details, tic_minimum, tic_maximum, eic_masses,
+            selectivity, wavelength, wavelength_unit]
     """
     measurement_list = []
     
@@ -288,29 +242,17 @@ def extract_product_measurements(measurements):
 
 def extract_analyses(analyses):
     """
-    Description: 
-        Takes in a analyses and returns reaction analyses info:
-            key
-            type
-            details 
-            chmo id
-            is of isolated species
-            data dict
-            nstrument manufacturer
-            instrument last calibrated
+    Extracts analytical data from ORD reaction analyses.
 
-    Algorithm:
-        1. Create an empty list to hold analyses info (analyses_list)
-        2. Loop through each analysis
-        3. Extract and append analysis info to analyses_list
-   
-    Args: 
-        analyses:
-            Analyses of a reaction
-    
-    Returns: 
-        list:
-            A list containing reaction analyses
+    Processes analysis objects to extract information about analytical techniques,
+    instrument details, and associated data for reaction outcome characterization.
+
+    Args:
+        analyses (dict): Dictionary of analysis objects keyed by analysis_key.
+
+    Returns:
+        list: A list of dictionaries, where each dictionary contains:
+            {'analysisKey': str, 'analysisType': str, 'Details': str, 'CHMO_ID': str, 'IsolatedSpecies': bool, 'data': dict, 'instrumentManufacturer': str, 'lastCalibrated': datetime}
     """
     analyses_list = []
     data_dict = {}

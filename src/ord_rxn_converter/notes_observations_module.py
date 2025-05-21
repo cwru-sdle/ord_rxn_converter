@@ -1,6 +1,6 @@
 from ord_schema.proto import dataset_pb2, reaction_pb2
 from google.protobuf.message import Message
-from ord_rxn_converter.utility_functions import extract_all_enums
+from ord_rxn_converter.utility_functions_module import extract_all_enums
 
 #generate enums_data to be accessible here TODO - have importable object instead..?
 enums_data = extract_all_enums(reaction_pb2)
@@ -9,42 +9,43 @@ enums_data = extract_all_enums(reaction_pb2)
 def extract_notes_observations(reactionID, notes, observations=None):
 
     """
-    Description: 
-        Takes in a reactionID, notes, and observations if available and returns reaction notes:
-            reactionID
-            is heterogeneous
-            forms precipitate
-            is exothermic
-            offgasses,
-            is sensitive to moisture
-            is sensitive to oxygen
-            is sensitive to light 
-            safety notes
-            procedure details
-            and observations (if available):
-            time value
-            time unit 
-            comment 
-            image kind
-            image description
-            image format
+    Extracts reaction notes and optional observations from ORD reaction data.
 
-    Algorithm:
-        1. Check if observations are present and extract time value and unit
-        2. Extract image kind from observations
-        3. Add notes and observation values to a list (reaction_notes_observations)
-   
-    Args: 
-        reactionID:
-            Unique ID of a reaction 
-        notes:
-            Notes of a reaction
-        observations:
-            Observations of a reaction
-    
-    Returns: 
-        list:
-            A list containing reaction notes and observations
+    This function takes a reaction ID, notes, and optionally observations, and returns
+    a list summarizing various reaction notes and details from observations if provided.
+    The notes include flags for reaction characteristics, safety notes, and procedure details.
+    Observations include time, comments, and image metadata.
+
+    Args:
+        reactionID (str): Unique identifier for the reaction.
+        notes (object): Notes object containing reaction flags and textual details.
+            Expected attributes:
+                - is_heterogeneous (bool)
+                - forms_precipitate (bool)
+                - is_exothermic (bool)
+                - offgasses (bool)
+                - is_sensitive_to_moisture (bool)
+                - is_sensitive_to_oxygen (bool)
+                - is_sensitive_to_light (bool)
+                - safety_notes (str)
+                - procedure_details (str)
+        observations (list, optional): List of observation objects, each possibly containing:
+            - time.value (float)
+            - time.units (enum int)
+            - comment (str)
+            - image with kind, description, and format attributes
+
+    Returns:
+        list: A list containing the following elements in order:
+            [reactionID (str), is_heterogeneous (bool), forms_precipitate (bool), is_exothermic (bool), offgasses (bool), is_sensitive_to_moisture (bool), is_sensitive_to_oxygen (bool), is_sensitive_to_light (bool), safety_notes (str), procedure_details (str), observations (list of dict or None)]
+
+        Each dict in observations contains keys:
+            - 'time': float
+            - 'timeUnit': str
+            - 'comment': str
+            - 'imageKind': str
+            - 'imageDescription': str
+            - 'imageFormat': str
     """
 
     # optional bool is_heterogeneous = 1 

@@ -1,7 +1,7 @@
 # import requirements: 
 from ord_schema.proto import dataset_pb2, reaction_pb2
 from google.protobuf.message import Message
-from ord_rxn_converter.utility_functions import extract_all_enums
+from ord_rxn_converter.utility_functions_module import extract_all_enums
 from ord_rxn_converter.inputs_module import extract_input_addition, extract_amount
 from ord_rxn_converter.conditions_module import temperature_conditions, stirring_conditions
 from ord_rxn_converter.identifiers_module import extract_compound_identifiers, generate_compound_table
@@ -11,22 +11,21 @@ enums_data = extract_all_enums(reaction_pb2)
 
 def extract_reaction_workups(workups, reactionID):
     """
-    Extract reaction workups
+    Extracts workup details from an ORD reaction workup list.
 
-    Takes in workups and reactionID and returns reaction workups:
-        input components
-        input addition details
-        temperature conditions
-        stirring conditions
-
-    Algorithm:
-        1. Extract
+    This function parses a list of `ReactionWorkup` protobuf messages associated with a reaction
+    and extracts structured information including compound input components, input addition
+    details, temperature and stirring conditions, and metadata such as pH or automation status.
 
     Args:
-        A workups message type (based on ORD using Google Protobuf)
-    
-    Returns: 
-        A list of workups for a reaction
+        workups (list): A list of `ReactionWorkup` messages from `reaction_pb2.Reaction.workups`.
+        reactionID (str): A unique identifier for the reaction.
+
+    Returns:
+        list: A list of extracted workup information for the reaction. Each item in the list corresponds
+        to a single `ReactionWorkup` and contains the following fields:
+
+        [reactionID (str), workup_type (str), workup.details (str), workup.duration.value (float), workup_duration_unit (str),  input_components (dict or None), input_addition_details (dict or None), temperature_conditions_list (list or None), keep_phase (str), stirring_conditions_list (list or None), target_ph (float or None), is_automated (bool or None)]
     """
 
     # initialize lists 

@@ -1,7 +1,7 @@
 # import requirements: 
 from ord_schema.proto import dataset_pb2, reaction_pb2
 from google.protobuf.message import Message
-from ord_rxn_converter.utility_functions import extract_all_enums
+from ord_rxn_converter.utility_functions_module import extract_all_enums
 
 #generate enums_data to be accessible here TODO - have importable object instead..?
 enums_data = extract_all_enums(reaction_pb2)
@@ -9,27 +9,29 @@ enums_data = extract_all_enums(reaction_pb2)
 def extract_reaction_conditions(conditions, reactionID: str) -> list:
 
     """
-    Extract the conditions object of a reaction recorded in ORD Google Protobuf schema. 
-    If temperature, pressure, stirring, illumination, electrochemistry, or flow conditions exist within the reaction condition, the function will call the corresponding function to extract those attributes.
-    It will also extract reflux, pH, conditions_are_dynamic, and details fields if available. 
+    Extracts reaction condition information from an ORD reaction message.
 
-    Algorithm:
-        1. Check if conditions exist
-        2. Extract existing reaction conditions
-        3. Add these values to a reaction conditions list
+    This function aggregates all available reaction condition data from an
+    Open Reaction Database (ORD) `reaction` message, including temperature,
+    pressure, stirring, illumination, electrochemistry, and flow conditions.
 
-    Args: 
-        conditions: The conditions as an ORD condition message type (Google Protobuf)
-        reactionID: The unique ID of a reaction extracted from extract_reaction_metadata function (string)
-            
+    Args:
+        reaction (message.Reaction): The ORD reaction message from which to
+            extract condition data.
+
     Returns:
-        A list containing the existing reaction conditions. 
-    
-    Raises Error: 
-        - if conditions is not a 'ReactionConditions' message type. 
-        - if reactionID is missing.
+        Dict[str, Dict[str, Union[str, float, bool]]]: A dictionary where keys
+        represent condition types (e.g., "temperature", "pressure", etc.) and
+        values are dictionaries of extracted parameters for each condition.
+        If a condition is not present in the reaction message, it is omitted
+        from the output.
 
-    Examples: 
+    Example:
+        >>> from ord_schema.proto import reaction_pb2
+        >>> from ord_schema.proto import dataset_pb2
+        >>> dataset = dataset_pb2.Dataset()
+        >>> reaction = dataset.reactions[0] 
+        >>> conditions = extract_reaction_conditions(reaction.conditions, reactionID='rxn-028')
     """
 
     # TODO: If object temperature is not None, run the extract_temperature_conditions function
@@ -96,23 +98,15 @@ def extract_reaction_conditions(conditions, reactionID: str) -> list:
 def temperature_conditions(temperature) -> dict:
 
     """
-    Extract the temperature condition object of a reaction recorded in ORD Google Protobuf schema.
-    
-    Takes in a temperature and extracts:
-        temperature control type i.e. how the temperature setpoint is controlled/achieved
-        temperature setpoint i.e. temperature set for the reaction/instrument by the experimenter
-        temperature unit; i.e. one of the options: Unspecified, Celsius, Fahrenheit, or Kelvin
-        temperature measurements: Determine how the temperature is recorded (i.e. with an internal or external thermometer), the temperature reading, and the time.
-   
-    Algorithm:
-        1. Extract existing temperature conditions
-        2. Add these values to the temperature conditions list
-    
-    Args: 
-        A temperature condition message type (based on ORD using Google Protobuf)
-   
-    Returns:  
-        A dict of temperature conditions (key/value pairs) for a reaction
+    Extracts temperature condition from an ORD reaction message.
+
+    Args:
+        reaction (message.Reaction): The reaction message containing temperature conditions.
+
+    Returns:
+        Optional[Dict[str, Union[str, float]]]: A dictionary with temperature
+        condition details, or None if no temperature condition is found. Keys
+        may include "value", "units", "setpoint", and "control".
     """
     # temperature control = 1 
     if temperature.control: 
@@ -146,22 +140,15 @@ def temperature_conditions(temperature) -> dict:
 def pressure_conditions(pressure) -> dict: 
 
     """
-    Extract the pressure condition object of a reaction recorded in ORD Google Protobuf schema. 
-    
-    Takes in pressure and returns pressure conditions:
-            pressure control & its details
-            pressure set point & unit
-            atmosphere; i.e. if the reaction was done under ambient air or under a fume hood or glovebox environment
-    
-    Algorithm:
-        1. Extract existing pressure conditions
-        2. Add these values to the pressure conditions list
-    
-    Args: 
-        A pressure condition message type (based on ORD using Google Protobuf)
-    
-    Returns: 
-        A dict of pressure conditions for a reaction
+    Extracts pressure condition from an ORD reaction message.
+
+    Args:
+        reaction (message.Reaction): The reaction message containing pressure conditions.
+
+    Returns:
+        Optional[Dict[str, Union[str, float]]]: A dictionary with pressure
+        condition details, or None if no pressure condition is found. Keys may
+        include "value", "units", and "control".
     """
     # pressure control = 1 
     if pressure.control:
@@ -199,21 +186,15 @@ def pressure_conditions(pressure) -> dict:
 def stirring_conditions(stirring) -> dict:
 
     """
-    Extract the stirring condition object of a reaction recorded in ORD Google Protobuf schema. 
-    
-    Takes in stirring and returns stirring conditions:
-            stirring method type & details
-            stirring rate 
-    
-    Algorithm:
-        1. Extract existing stirring conditions
-        2. Add these values to the stirring conditions list
-    
-    Args: 
-        A stirring condition message type (based on ORD using Google Protobuf)
-    
-    Returns: 
-        A dict of stirring conditions for a reaction 
+    Extracts stirring condition from an ORD reaction message.
+
+    Args:
+        reaction (message.Reaction): The reaction message containing stirring conditions.
+
+    Returns:
+        Optional[Dict[str, Union[str, float, bool]]]: A dictionary with stirring
+        condition details, or None if no stirring condition is found. Keys may
+        include "type", "rate", "units", and "control".
     """
     # stirring method type = 1
     stirring_method = enums_data['StirringConditions.StirringMethodType'][stirring.type]
@@ -230,26 +211,15 @@ def stirring_conditions(stirring) -> dict:
 def illumination_conditions(illumination) -> dict:
 
     """
-    Description: 
-        Takes in illumination and returns illumination conditions:
-            illumination type
-            illumination details
-            peak wavelength
-            color
-            distance to vessel
-    
-    Algorithm:
-        1. Check if illumination conditions exist
-        2. Extract existing illumination conditions
-        3. Add these values to the illumination conditions list
-   
-    Args: 
-        illumination:
-            An illumination condition message type (based on ORD using Google Protobuf)
-   
-    Returns: 
-        list:
-            A list of illumination conditions for a reaction
+    Extracts illumination condition from an ORD reaction message.
+
+    Args:
+        reaction (message.Reaction): The reaction message containing illumination conditions.
+
+    Returns:
+        Optional[Dict[str, Union[str, float]]]: A dictionary with illumination
+        condition details, or None if no illumination condition is found. Keys
+        may include "type", "wavelength", and "wavelength_units".
     """
     # type = 1
     illumination_type = enums_data['IlluminationConditions.IlluminationType'][illumination.type]
@@ -281,32 +251,16 @@ def illumination_conditions(illumination) -> dict:
 def electrochemistry_conditions(electrochemistry) -> dict:
 
     """
-    Description: 
-        Takes in electrochemistry and returns electrochemistry conditions:
-            electrochemistry type
-            electrochemistry details
-            current
-            current unit
-            voltage
-            voltage unit
-            anode material
-            cathode material
-            electrode separation
-            measurements
-            cell
-    
-    Algorithm:
-        1. Check if electrochemistry conditions exist
-        2. Extract existing electrochemistry conditions
-        3. Add these values to the electrochemistry conditions list
-    
-    Args: 
-        electrochemistry:
-            An electrochemistry condition message type (based on ORD using Google Protobuf)
-   
-    Returns: 
-        list:
-            A list of electrochemistry conditions for a reaction
+    Extracts electrochemistry condition from an ORD reaction message.
+
+    Args:
+        reaction (message.Reaction): The reaction message containing electrochemistry conditions.
+
+    Returns:
+        Optional[Dict[str, Union[str, float]]]: A dictionary with electrochemistry
+        condition details, or None if no electrochemistry condition is found.
+        Keys may include "type", "current", "potential", "cell_type", "anode",
+        and "cathode".
     """
 
     # type = 1 
@@ -371,27 +325,16 @@ def electrochemistry_conditions(electrochemistry) -> dict:
 def flow_conditions(flow) -> dict:
 
     """
-    Description: 
-        Takes in flow and returns flow conditions:
-            flow type
-            flow details
-            pump type
-            tubing type
-            tubing diameter
-            diameter unit
- 
-    Algorithm:
-        1. Check if flow conditions exist
-        2. Extract existing flow conditions
-        3. Add these values to the flow conditions list
-  
-    Args: 
-        flow:
-            A flow condition message type (based on ORD using Google Protobuf)
-   
-    Returns: 
-        list:
-            A list of flow conditions for a reaction
+    Extracts flow condition from an ORD reaction message.
+
+    Args:
+        reaction (message.Reaction): The reaction message containing flow conditions.
+
+    Returns:
+        Optional[Dict[str, Union[str, float]]]: A dictionary with flow
+        condition details, or None if no flow condition is found. Keys may
+        include "flow_rate", "flow_rate_units", "residence_time",
+        "residence_time_units", and "slug_diameter".
     """
     # type = 1
     flow_type = enums_data['FlowConditions.FlowType'][flow.type]
