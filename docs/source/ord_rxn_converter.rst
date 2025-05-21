@@ -32,10 +32,8 @@ Brief examples of how to use the package.
 
 .. code-block:: python
 
-   from ord_schema.proto import reaction_pb2
    from ord_schema.proto import dataset_pb2
    from ord_schema.message_helpers import load_message
-
    from ord_rxn_converter.identifiers_module import extract_reaction_identifiers
    from ord_rxn_converter.conditions_module import extract_reaction_conditions
 
@@ -56,14 +54,6 @@ Brief examples of how to use the package.
 
 API Reference
 -------------
-
-Main Module
-~~~~~~~~~~~
-
-.. automodule:: ord_rxn_converter
-   :members:
-   :undoc-members:
-   :show-inheritance:
 
 Utility Functions Module
 ~~~~~~~~~~~~~~~~~~~~~~~~

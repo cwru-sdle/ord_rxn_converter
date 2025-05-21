@@ -7,12 +7,22 @@ readme = "README.md"
 requires-python = ">=3.7"
 license = "MIT"
 authors = [
-  { name="Quynh D. Tran", email="qdt@case.edu" }
+  { name = "Quynh D. Tran", email = "qdt@case.edu" },
+  { name = "Ethan Tobey", email = "emt101@case.edu" },
+  { name = "Holly Schreiber", email = "hls92@case.edu" },
+  { name = "Laura S. Bruckman", email = "lsh41@case.edu" },
+  { name = "Roger H. French", email = "rxf131@case.edu" }
 ]
 classifiers = [
   "Programming Language :: Python :: 3",
   "Operating System :: OS Independent",
+  "License :: OSI Approved :: MIT License",
 ]
+
+ keywords = [
+  "chemistry", "ord", "open-reaction-database",
+  "machine-learning", "cheminformatics", "reaction-data",
+    ]
 
 dependencies = [
   "ord_schema",

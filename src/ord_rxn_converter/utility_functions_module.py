@@ -78,7 +78,7 @@ def extract_all_enums(proto_module):
 
         }
     
-    Examples:
+    Example:
         >>> from ord_schema.proto import reaction_pb2
         >>> from utility_functions_module import extract_all_enums
         >>> enums_data = extract_all_enums(reaction_pb2)

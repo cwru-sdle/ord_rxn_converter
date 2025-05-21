@@ -1,5 +1,5 @@
-ord_rxn_converter
-=================
+Modules
+=======
 
 .. toctree::
    :maxdepth: 4
