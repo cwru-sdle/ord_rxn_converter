@@ -1,7 +1,7 @@
 # import requirements: 
 from ord_schema.proto import dataset_pb2, reaction_pb2
 from google.protobuf.message import Message
-from ord_rxn_converter.utility_functions import extract_all_enums
+from ord_rxn_converter.utility_functions_module import extract_all_enums
 from ord_rxn_converter.identifiers_module import extract_compound_identifiers, generate_compound_table
 
 #generate enums_data to be accessible here TODO - have importable object instead..?
@@ -10,37 +10,29 @@ enums_data = extract_all_enums(reaction_pb2)
 def extract_input_addition (inputs, reactionID = ''):
 
     """
-    Description: 
-        Takes in reaction inputs and returns input addition information:
-            input key
-            order
-            time value
-            time unit
-            speed
-            duration value
-            duration unit
-            device
-            temperature value
-            temperature unit
-            flow rate value
-            flow rate unit
-            reaction texture
-            input texture details
-    
-    Algorithm:
-        1. Initialize an empty list for addition details (input_addition_details)
-        2. Loop thorugh inputs
-        3. Extract addition info and append to addition details list
-    
-    Args: 
-        inputs: 
-            Inputs from a reaction, a reaction input object (Google Protobuf based on ORD structure schema)
-        reactionID: 
-            Unique ID of a reaction
+    Extracts detailed addition information from reaction inputs.
 
-    Returns: 
-        list:
-            A list of input addition information
+    This function processes the reaction inputs and extracts detailed 
+    information about each addition, such as timing, speed, device, temperature, 
+    flow rate, and texture information.
+
+    Args:
+        inputs (dict): Reaction inputs from a reaction object (protobuf-based ORD schema).
+            Typically accessed as `reaction.inputs['input_key']`.
+        reactionID (str, optional): Unique identifier for the reaction. Defaults to ''.
+
+    Returns:
+        list: A list of lists, each containing addition details:
+            [reactionID, input key, addition order, addition time value, 
+             addition time unit, addition speed, addition duration value,
+             addition duration unit, addition device, addition temperature value,
+             addition temperature unit, flow rate value, flow rate unit, 
+             reaction texture, input texture details]
+
+    Example:
+        >>> from inputs_module import extract_input_addition
+        >>> extract_input_addition(reaction.inputs, reactionID='rxn-001')
+        [['', 'm1_m2', 0, 0.0, 'UNSPECIFIED', ...]]
     """
     input_addition_details = [] 
 
@@ -70,56 +62,25 @@ def extract_input_addition (inputs, reactionID = ''):
 
 def extract_input_components (inputs, reactionID = ''):
     """
-    Description: 
-        Takes in component inputs and returns input components:
-            reactionID
-            input
-            component identifiers
-            amount value
-            amount unit
-            reaction role
-            is limiting
-            compound preparation
-            component source 
-            feature dict
-            analyses list
-            texture
-        and compound identifiers:
-            inchi key
-            smiles
-            inchi
-            upac_name
-            name
-            cas number
-            pubchem cid
-            chemspider id
-            cxsmiles
-            unspecified
-            custom
-            molblock
-            xyz
-            uniprot id
-            pdb_id
-            amino acid sequence
-            helm
-            mdl
-    
-    Algorithm:
-        1. Initialize an empty list for input components and a compound identifer table
-        2. Loop thorugh inputs
-        3. Loop through components in inputs
-        4. Generate compound identifier table and appeend to compound table list
-        5. Extract compound inputs and append to input componenets list
-    
-    Args: 
-        inputs: 
-            Inputs from a reaction, a reaction input object (Google Protobuf based on ORD structure schema)
-        reactionID: 
-            Unique ID of a reaction
+    Extracts detailed information about reaction input components and their compound identifiers.
 
-    Returns: 
-        list:
-            A list of input component information
+    Processes each input and its components, extracting chemical and experimental details
+    including identifiers, amounts, roles, preparations, sources, features, analyses, and texture.
+
+    Args:
+        inputs (dict): Reaction inputs from a reaction object (protobuf-based ORD schema).
+            Typically accessed as `reaction.inputs['input_key']`.
+        reactionID (str, optional): Unique identifier for the reaction. Defaults to ''.
+
+    Returns:
+        tuple: 
+            - list: List of input component details with structure:
+              [reactionID, input key, inchi_key, amount value, amount unit, reaction role, is limiting (bool), compound preparation (list of dicts), component source (dict), feature dictionary, analyses list, texture dictionary]
+            - list: List of compound identifier tables (each a list of compound identifiers).
+
+    Example:
+        >>> from inputs_module import extract_input_components
+        >>> components, compound_table = extract_input_components(reaction.inputs, reactionID='rxn-001')
     """
     input_components = []
     compound_table = [] 
@@ -183,17 +144,22 @@ def extract_input_components (inputs, reactionID = ''):
 
 def extract_amount (compound):
     """
-    Description: Takes in compound and returns its amount and corresponding unit in a reaction:
-        amount
-        unit (mass, mole, gram)
+    Extracts the amount value and unit from a compound's amount field.
 
-    Args: 
-        compound:
-            Compound of a reaction
+    This function reads the nested `amount` field from a compound (which is a protobuf oneof)
+    and returns its numerical value and the unit as a string.
 
-    Return: 
-        list:
-            A list of amount value and unit for a specific compound
+    Args:
+        compound (protobuf message): A compound component of a reaction with an `amount` field.
+
+    Returns:
+        tuple:
+            - float: Amount value.
+            - str: Amount unit name (e.g., 'MASS', 'MOLE', 'GRAM').
+
+    Example:
+        >>> from inputs_module import extract_amount
+        >>> amount_value, amount_unit = extract_amount(component)
     """
     
     nested_message = getattr(compound.amount, compound.amount.WhichOneof('kind')) # amount is oneof message type; must use WhichOneof('kind') to extract the inner message

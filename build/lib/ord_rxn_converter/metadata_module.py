@@ -7,25 +7,30 @@ from google.protobuf.message import Message
 def extract_dataset_metadata(dataset):
 
     """
-    Description: 
-        Takes in a dataset and returns its metadata:
-            ID
-            ORD ID
-            Name
-            Description
+    Extracts key metadata from a loaded ORD dataset message.
 
-    Algorithm:
-        1. Create a unique dataset ID by splitting the ORD ID at '-' and replacing the prefix as 'mds_dataset-' (this signifies the dataset is in MDS database and not ORD)
-        2. Extract the dataset name and description
-        3. Add the unique ID, ORD ID, name, and description to a list (dataset_metadata)
-   
-    Args: 
-        dataset:
-            A dataset from ORD that has been converted to a Python object (which has a type of a message in Google Protocol Buffers) instead of a message in Google Protocol Buffer. 
-    
-    Returns: 
-        list:
-            A list containing dataset metadata
+    This function parses a loaded Protocol Buffer dataset message and extracts 
+    high-level metadata such as a modified dataset ID, original ORD ID, name, 
+    and description. The modified ID is formatted to reflect that the dataset 
+    is stored in an MDS (custom) database.
+
+    Args:
+        dataset (dataset_pb2.Dataset): 
+            A dataset message loaded via `load_message` from the ORD schema.
+
+    Returns:
+        list: 
+            A list containing the following metadata fields:
+            - `dataset_id` (str): Custom MDS-formatted dataset ID.
+            - `ord_dataset_id` (str): Original dataset ID from ORD.
+            - `name` (str): Human-readable name of the dataset.
+            - `description` (str): Textual description of the dataset.
+
+    Example:
+        >>> from metadata_module import extract_dataset_metadata
+        >>> dataset = load_message("example_dataset.pb", dataset_pb2.Dataset())
+        >>> extract_dataset_metadata(dataset)
+        ['mds_dataset-000001', 'ord_dataset-000001', '...', '...']
     """
 
     dsID = re.split('-', dataset.dataset_id) 
@@ -42,52 +47,45 @@ def extract_dataset_metadata(dataset):
 def extract_reaction_metadata(provenance, reactionID):
 
     """
-    Description: 
-        Takes in a Protobuf message (PROVENANCE) and returns reaction provenance:
-            reactionID
-            doi (string)
-            patent (string)
-            publicationURL (string)
-            createdTime (time?)
-            createdPerson (string of ORCiD)
-            modified time: use flattened list of modification times (since there can be multiple)
-            modified person: use flattened list of people (since there can be multiple, corresponding with modification times)
-    
+    Extracts reaction-level provenance and contributor metadata from a reaction.
 
-            reactionID
-            orcid
-            city
-            experiment start
-            doi (string)
-            patent (string)
-            publication url (string)
-            created time value (time?)
-            created person orcid (string)
-            created details  
-            modified times: use flattened list of modification times (since there can be multiple)
-            modified people: use flattened list of people (since there can be multiple, corresponding with modification times)
-        and person metadata:
-            orcid
-            username
-            name
-            organization
-            email
+    This function parses the `Provenance` message from a reaction in an ORD dataset, 
+    extracting detailed metadata related to:
+    - The reaction's source (e.g., DOI, patent, publication)
+    - Timing and authorship of creation and modifications
+    - Contributor identities (with ORCID and contact details)
 
-    Algorithm:
-        1. From input provenance, extract reaction provenance data
-        2. Create an empty list to hold person metadata
-        3. Extract created person metadata and append to person_metadata list
-        4. Extract a list of modified times
-        5. Extract modified orcids and person metadata and append to person_metadata list
-        6. Add provenance data, modified times, and modified orcids to provenance_data list
-    
-    Args: 
-        provenance:
-            Reaction provenance from ORD
-    
-    Returns: 
-        list:
-            List containing reaction metadata (provenance and person)
+    Args:
+        provenance (reaction_pb2.Provenance): 
+            A Provenance message associated with a reaction.
+        reactionID (str): 
+            The unique identifier of the reaction being processed.
+
+    Returns:
+        tuple:
+            - `provenance_data` (list): Reaction-level metadata including:
+                - `reactionID` (str)
+                - `experimenter_orcid` (str)
+                - `city` (str)
+                - `experiment_start` (str)
+                - `doi` (str)
+                - `patent` (str)
+                - `publication_url` (str)
+                - `created_time` (str)
+                - `created_person_orcid` (str)
+                - `created_details` (str)
+                - `modified_times` (str, comma-separated)
+                - `modified_people` (str, comma-separated ORCIDs)
+            - `person_metadata` (list of list of str): Contributor metadata:
+                - Each inner list includes:
+                    `[orcid, username, full_name, organization, email]`
+
+    Example:
+        >>> from metadata_module import extract_reaction_metada
+        >>> reaction = dataset.reactions[0]
+        >>> extract_reaction_metadata(reaction.provenance, "reaction-001")
+        (['reaction-001', '0000-0001-...', 'Boston', ...], 
+         [['jsmith', 'John Smith', '0000-0001-...', ...], ...])
     """
     
     person_metadata = []

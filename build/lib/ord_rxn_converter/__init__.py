@@ -6,7 +6,7 @@ if package_dir not in sys.path:
     sys.path.insert(0, package_dir)
 
 from . import dataset_module
-from . import utility_functions
+from . import utility_functions_module
 from . import metadata_module
 from . import identifiers_module
 from . import inputs_module

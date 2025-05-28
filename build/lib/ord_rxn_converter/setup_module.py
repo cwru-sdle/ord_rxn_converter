@@ -2,7 +2,7 @@
 from ord_schema.proto import dataset_pb2, reaction_pb2
 from google.protobuf.message import Message
 import pandas as pd
-from ord_rxn_converter.utility_functions import extract_all_enums
+from ord_rxn_converter.utility_functions_module import extract_all_enums
 
 #generate enums_data to be accessible here TODO - have importable object instead..?
 enums_data = extract_all_enums(reaction_pb2)
@@ -10,32 +10,32 @@ enums_data = extract_all_enums(reaction_pb2)
 def extract_reaction_setup(setup, reactionID):
 
     """
-    Description: 
-        Takes in a reaction and returns reaction setup:
-            vessel
-            vessel material
-            vessel volume
-            vessel volume unit
-            vessel preparation
-            vessel attachment
-            is automated?
-            automation platform
-            automation code
-            reaction environment
-    Algorithm:
-        1. Initialize an empty list to hold reaction provenance
-        3. Extract reaction setup
-        4. From setup, preparation, and attachment, extract reaction setup data
-        5. Append these values to the reaction provenance list
-        6. Create a dataframe placing each reaction provenance into its corresponding column
-    Args: 
-        reaction:
-            A reaction from ORD
-    Returns: 
-        dataframe:
-            Dataframe containing the reaction provenance of a reaction
+    Extracts detailed setup information from a reaction object.
+
+    This function processes the reaction setup section of an ORD (Open Reaction Database) 
+    reaction object and extracts metadata about the vessel, its material, volume, 
+    preparations, attachments, automation details, and environmental setup.
+
+    Args:
+        setup (reaction_pb2.ReactionSetup): 
+            A ReactionSetup protobuf object containing details about how the reaction was set up.
+        reactionID (str): 
+            Unique identifier for the reaction being processed.
+
+    Returns:
+        list: 
+            A list representing the reaction setup details in the following structure:
+            [reactionID (str), vessel type (str), vessel material (str), vessel volume (float or None), volume unit (str or None), vessel preparations (dict or None), vessel attachments (dict or None), is automated (bool or None),  automation platform (str or None), automation code (str), reaction environment (str or None)]
+
+    Example:
+        >>> from ord_schema.proto import reaction_pb2
+        >>> from setup_module import extract_reaction_setup
+        >>> from ord_schema.proto import dataset_pb2
+        >>> dataset = dataset_pb2.Dataset()
+        >>> reaction = dataset.reactions[0] 
+        >>> reaction_setup = extract_reaction_setup(reaction.setup, reactionID='rxn-042')
     """
-    
+
     vessel = enums_data['Vessel.VesselType'][setup.vessel.type]
     vessel_material = enums_data['VesselMaterial.VesselMaterialType'][setup.vessel.material.type]
     attach_dict = {} 

@@ -14,16 +14,48 @@ from ord_rxn_converter.notes_observations_module import extract_notes_observatio
 from ord_rxn_converter.outcomes_module import extract_reaction_outcomes
 from ord_rxn_converter.setup_module import extract_reaction_setup
 from ord_rxn_converter.workups_module import extract_reaction_workups
-from ord_rxn_converter.utility_functions import extract_all_enums
+from ord_rxn_converter.utility_functions_module import extract_all_enums
 
 
 def extract_dataset (filepath, compounds=pd.DataFrame(), persons=pd.DataFrame()):
     """
-    Function: Takes in a filepath and extract a dataset & its reactions in its entirety and output a dictionary of dataframes; one dataframe per reaction component.
+    Extracts all structured data from an ORD dataset file and organizes it into a dictionary of DataFrames.
 
-    Argument: filepath to a dataset stored in the zip or unzip Google Protobuf file format
+    This function loads a dataset from a `.pb` or `.pbtxt` file (compressed or uncompressed), then extracts and organizes
+    its reactions and associated metadata into tabular form. Each component of the reaction—identifiers, inputs, conditions, 
+    setup, workups, outcomes, and more—is parsed into a separate `pandas.DataFrame`.
 
-    Return: A dictionary of dataframes; one for each reaction component (identifiers, inputs, setup, notes & observations, conditions, workups, & outcomes). 
+    If compound or person tables are provided, they will be updated to include any new compounds or people found during extraction.
+
+    Args:
+        filepath (str): Path to the input file (either zipped or unzipped Google Protobuf format).
+        compounds (pd.DataFrame, optional): Existing compound table to update or append to. Defaults to an empty DataFrame.
+        persons (pd.DataFrame, optional): Existing person table to update or append to. Defaults to an empty DataFrame.
+
+    Returns:
+        dict: A dictionary containing the following keys, each mapping to a `pandas.DataFrame`:
+        
+            - `"dataset_metadata"`: Dataset-level metadata.
+            - `"reaction_metadata"`: Reaction-level metadata including provenance and contributor info.
+            - `"reaction_identifiers"`: SMILES, InChI, and other identifiers for each reaction.
+            - `"input_components"`: Details of each input component (compound, amount, role, etc.).
+            - `"input_addition"`: Temporal details for the addition of inputs.
+            - `"reaction_setup"`: Setup information including vessels and automation.
+            - `"reaction_conditions"`: Environmental and operational reaction conditions.
+            - `"reaction_notes"`: Observations and experimental notes.
+            - `"reaction_workups"`: Post-reaction processing steps.
+            - `"reaction_outcomes"`: Products and analyses of reaction outcomes.
+            - `"compound"`: A table of all compounds involved across reactions.
+            - `"person"`: A table of contributors extracted from provenance.
+
+    Raises:
+        FileNotFoundError: If the `filepath` does not exist.
+        ValueError: If the Protobuf file is invalid or does not conform to `dataset_pb2.Dataset`.
+
+    Example:
+        >>> from ord_rxn_converter.dataset_module import extract_dataset
+        >>> out = extract_dataset("example_dataset.pb")
+        >>> out["reaction_metadata"].head()
     """
     enums_data = extract_all_enums(reaction_pb2)
 

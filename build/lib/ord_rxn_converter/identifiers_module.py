@@ -3,39 +3,29 @@ from ord_schema.proto import dataset_pb2, reaction_pb2
 from google.protobuf.message import Message
 from rdkit import Chem
 from rdkit.Chem import AllChem
-from ord_rxn_converter.utility_functions import extract_all_enums
+from ord_rxn_converter.utility_functions_module import extract_all_enums
 
 #generate enums_data to be accessible here TODO - have importable object instead..?
 enums_data = extract_all_enums(reaction_pb2)
 
 def extract_reaction_identifiers(identifiers, reactionID: str) -> list:
-    """ 
-    Description: Takes in reaction identifiers and reaction ID and returns reaction identifiers:
-        reactionID
-        smiles
-        cxsmiles
-        rdfile
-        rinchi
-        reaction type
-        unspecified
-        custom
-        details
-        is mapped: True if the identifier is mapped atom-by-atom
-   
-    Algorithm: 
-        1. Initialize an empty list to hold reaction identifiers (reaction_identifier)
-        2. Loop through identifiers
-        3. Extract and append identifier type, value, details, and is_mapped to reaction_identifier
-   
+    """
+    Extracts detailed reaction identifier information for a given reaction.
+
     Args:
-        identifiers: 
-            Reaction identifiers of a reaction
-        reactionID: 
-            Unique ID of a reaction 
-   
-    Returns: 
-        list: 
-            A list containing reaction identifiers of a reaction
+        identifiers (list): A list of `ReactionIdentifier` protobuf messages.
+        reactionID (str): Unique reaction ID string.
+
+    Returns:
+        list: A list in the format:
+            [reactionID, reaction_smiles, reaction_cxsmiles, rdfile, rinchi, reaction_type, unspecified, custom, details_dict, mapped_dict]
+
+    Example:
+        >>> from identifiers_module import extract_reaction_identifiers
+        >>> extract_reaction_identifiers(reaction.identifiers, 'rxn-000001')
+        ['rxn-000001', 'CCO>>CC=O', None, None, None,
+         'REACTION_TYPE_XYZ', None, None,
+         {'REACTION_CXSMILES': 'CCO>>CC=O'}, {'REACTION_CXSMILES': True}]
     """
 
     # Initiate empty lists to store identifier type, details, value, and is_mapped.
@@ -73,29 +63,24 @@ from rdkit import Chem
 
 def extract_compound_identifiers(compound_identifiers):
 
-    """ 
-    Description: Takes in compound identifiers and returns compound identifiers:
-        name
-        smiles
-        inchi
-        inchi key
-        cxsmiles
-   
-    Algorithm: 
-        1. Initialize empty lists to hold compound identifier type, details, and value
-        2. Loop through identifiers
-        3. Extract and append identifier type, details, and value to corresponding lists
-        4. Create a dictionary of identifier type and value
-        5. Extract identifier type and value pairs from the dictionary
-        6. Generate missing values from known values using RDKit
-    
+    """
+    Extracts compound identifier values and ensures key identifiers are present.
+
+    Generates missing InChI keys and CXSMILES if possible using RDKit.
+
     Args:
-        identifiers: 
-            Compound identifiers of a reaction
-   
-    Returns: 
-        list: 
-            A list containing compound identifiers of a reaction
+        compound_identifiers (list): A list of `CompoundIdentifier` protobuf messages.
+
+    Returns:
+        tuple: 
+            - str: InChI key of the compound.
+            - dict: Dictionary of identifier types to their values.
+
+    Example:
+        >>> from identifiers_module import extract_compound_identifiers
+        >>> compound_identifiers = reaction.inputs['...'].components[0].identifiers
+        >>> extract_compound_identifiers(compound_identifiers)
+        ('ROSDSFDQCJNGOL-UHFFFAOYSA-N', {'NAME': 'dimethylamine', 'SMILES': 'CCO', ...})
     """
     
     identifier_type_list = []
@@ -139,44 +124,24 @@ def extract_compound_identifiers(compound_identifiers):
 
 def generate_compound_table (compound_identifiers):
 
-    """ 
-    Description: Takes in compound identifiers and returns all compound identifier types and values:
-        inchi key
-        smiles
-        inchi
-        upac_name
-        name
-        cas number
-        pubchem cid
-        chemspider id
-        cxsmiles
-        unspecified
-        custom
-        molblock
-        xyz
-        uniprot id
-        pdb_id
-        amino acid sequence
-        helm
-        mdl
-        details
-   
-    Algorithm: 
-        1. Initialize empty lists to hold compound identifier type, details, and value
-        2. Loop through identifiers
-        3. Extract and append identifier type, details, and value to corresponding lists
-        4. Create a dictionary of identifier type and value
-        5. Create a dictionary of identifier type and details
-        6. Check for inchi key and generate if not present
-        7. Extract comopund identifier values and add to list
-    
+    """
+    Generates a full set of compound identifiers in a fixed order.
+
+    If InChI key or CXSMILES are missing, attempts to generate them using RDKit.
+
     Args:
-        identifiers: 
-            Compound identifiers of a reaction
-   
-    Returns: 
-        list: 
-            A list containing compound identifiers of a reaction
+        compound_identifiers (list): A list of `CompoundIdentifier` protobuf messages,
+            typically accessed via `reaction.inputs['m1_m2'].components[0].identifiers`.
+
+    Returns:
+        list: A list of compound identifier values in this order:
+            [inchi_key, smiles, inchi, iupac_name, name, cas_number, pubchem_cid, chemspider_id, cxsmiles, unspecified, custom, molblock, xyz, uniprot_id, pdb_id, amino_acid_sequence, helm, mdl]
+
+    Example:
+        >>> from identifiers_module import generate_compound_table
+        >>> compound_identifiers = reaction.inputs['...'].components[0].identifiers
+        >>> generate_compound_table(compound_identifiers)
+        ['BQJCRHHNABKAKU-KBQPJGBKSA-N', 'CCO', 'InChI=1S/C2H6O/...', ...]
     """
 
     identifier_type_list = []
