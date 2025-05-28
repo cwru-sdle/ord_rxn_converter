@@ -2,7 +2,7 @@
 
 ## Introduction
 
-`ord_rxn_converter` is a Python package designed to streamline the transformation of chemical reaction data from the Open Reaction Database (ORD) format into structured datasets suitable for downstream machine learning and data analysis tasks. It provides modular tools for parsing, extracting, and converting complex reaction schema into interpretable tables, lists, and dictionaries that can be easily ingested by models or used in exploratory chemical data analysis.
+`ord_rxn_converter` is a Python package designed to streamline the transformation of chemical reaction data from the Open Reaction Database (ORD) in Google Protocol Buffer format into structured datasets suitable for downstream machine learning and data analysis tasks. It provides modular tools for parsing, extracting, and converting complex reaction schema into interpretable tables, lists, and dictionaries that can be easily ingested by models or used in exploratory chemical data analysis.
 
 The library is organized into specialized modules that handle different components of the reaction schema — including identifiers, inputs, conditions, setup, workups, outcomes, and notes/observations — as well as utility functions for key operations and dataset generation. The package is structured for clarity and extendibility, enabling researchers to adapt it to varying needs in computational chemistry or cheminformatics pipelines.
 
@@ -28,17 +28,17 @@ The project originated as part of a broader effort to accelerate machine learnin
 
 - The project is in active development, and interface or function-level changes may occur in future versions.
 
-## ord_rxn_converter
-### This is a package repo.
+## Affiliations: 
+Materials Data Science for Stockpile Stewardship Center of Excellence (MDS3-COE),
+Solar Durability and Lifetime Extension (SDLE) Research Center, 
+Materials Science and Engineering,
+Case Western Reserve University,
+Cleveland, OH 44106, USA
 
-## Repo Owner: Quynh D. Tran
-### Purpose of this repo: Extract chemical reaction data from ORD schema (serialized in Google Protocol Buffers) into RDB and RDF triples
-
-[Case Western Reserve University, SDLElab] [1]
-
-[1]: http://sdle.case.edu
 
 # Python package documentation
 https://sphinx-rtd-tutorial.readthedocs.io/en/latest/index.html
 
-Testing CI/CD
+## Acknowledgements: 
+
+This work was supported by the U.S. Department of Energy’s Office of Energy Efficiency and Renewable Energy (EERE) under Solar Energy Technologies Office (SETO) Agreement Numbers DE-EE0009353 and DE-EE0009347, Department of Energy (National Nuclear Security Administration) under Award Number DE-NA0004104 and Contract number B647887, and U.S. National Science Foundation Award under Award Number 2133576.
