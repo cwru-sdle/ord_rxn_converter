@@ -1,4 +1,4 @@
-# This is the README for the ord_rxn_converter package
+# Project Description for ord_rxn_converter
 
 ## Introduction
 
@@ -36,7 +36,7 @@ Case Western Reserve University,
 Cleveland, OH 44106, USA
 
 
-# Python package documentation
+## Python package documentation
 https://sphinx-rtd-tutorial.readthedocs.io/en/latest/index.html
 
 ## Acknowledgements: 
