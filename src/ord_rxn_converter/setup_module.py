@@ -63,7 +63,7 @@ def extract_reaction_setup(setup, reactionID):
     automation_platform = setup.automation_platform if setup.automation_platform else None
     automation_code = ", ".join(f"{key}: {value}" for key, value in setup.automation_code.items()) 
     
-    reaction_environment = enums_data['VesselAttachment.VesselAttachmentType'][setup.environment.type] if setup.environment else None
+    reaction_environment = enums_data['ReactionSetup.ReactionEnvironment.ReactionEnvironmentType'][setup.environment.type] if setup.environment else None
 
     reaction_setup = [reactionID, vessel, vessel_material, vessel_volume, volume_unit, prep_dict, attach_dict, is_automated, automation_platform, automation_code, reaction_environment]
 
