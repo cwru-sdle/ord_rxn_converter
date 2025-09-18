@@ -39,7 +39,7 @@ Cleveland, OH 44106, USA
 The package will convert a dataset (that contains hundreds to thousands of reactions) in ORD schema in Google Protocol Buffers format into a dictionary of pandas DataFrames for each reaction portion: reaction identifiers, reaction inputs, reaction conditions, reaction setup, reaction outcomes, reaction notes and observations. 
 
 ## Python package documentation
-https://sphinx-rtd-tutorial.readthedocs.io/en/latest/index.html
+https://ord-rxn-converter.readthedocs.io/en/latest/
 
 ## Acknowledgements: 
 
