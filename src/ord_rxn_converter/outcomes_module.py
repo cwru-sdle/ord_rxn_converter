@@ -130,7 +130,6 @@ def extract_product (products):
             product.isolated_color, product_texture, feature_dict, reaction_role])
     
     return products_list, compound_identifiers
-
 def extract_product_measurements(measurements):
     """
     Extracts measurement data from ORD product measurements.
@@ -151,49 +150,35 @@ def extract_product_measurements(measurements):
             selectivity, wavelength, wavelength_unit]
     """
     measurement_list = []
-    
-    for measurement in measurements:        
-        # analysis_key =1 
+    for index, measurement in enumerate(measurements): 
         analysis_key = measurement.analysis_key if measurement.analysis_key else None
-        
-        # type = 2
+        compound_authentic = measurement.authentic_standard if measurement.authentic_standard else None
         measurement_type = enums_data['ProductMeasurement.ProductMeasurementType'][measurement.type]
 
-        # details = 3
+        measurement_value_type = measurement.WhichOneof('value') if measurement.WhichOneof('value') else None
 
-        # uses_internal_standard = 4
-
-        # is_normalized = 5
-
-        # uses_authentic_standard = 6
-
-        # authentic_standard = 6
-        # TODO: call compound function here
-        compound_authentic = measurement.authentic_standard if measurement.authentic_standard else None
-
-        if measurement.WhichOneof('value'):
-            measurement_value = getattr(measurement, measurement.WhichOneof('value'))
-        else:
-            measurement_value = None
-        
         # percentage = 8
-        if measurement_value == 'percentage': 
+        if measurement_value_type == 'percentage': 
             measurement_value = measurement.percentage.value
+            measurement_value_unit = 'Percent'
             
         # float_value = 9
-        elif measurement_value == 'float_vlaue':
-            measurement_value = measurement.float_value
+        elif measurement_value_type == 'float_value':
+            measurement_value = measurement.float_value.value
+            measurement_value_unit = None
         
         # string_value = 10
-        elif measurement_value == 'string_value':
+        elif measurement_value_type == 'string_value':
             measurement_value = measurement.string_value
+            measurement_value_unit = None
         
         # amount = 11 
-        elif measurement_value == 'amount':
-            amount_value, amount_unit = extract_amount(measurement)
-            measurement_value = {'amount':amount_value, 'unit':amount_unit}
+        elif measurement_value_type == 'amount':
+            amount_type, measurement_value, measurement_value_unit = extract_amount(measurement.amount)
         
-        else: measurement_value = None
+        else: 
+            measurement_value = None
+            measurement_value_unit = None
 
         # retention_time = 12 
         if measurement.retention_time:
@@ -203,6 +188,9 @@ def extract_product_measurements(measurements):
             retention_time = None
             time_unit = None
 
+        if measurement.selectivity:
+            select_type = enums_data['ProductMeasurement.Selectivity.SelectivityType'][measurement.selectivity.type]
+        
         # mass_spec_details = 13
         if measurement.mass_spec_details:
             mass_spec_type = enums_data['ProductMeasurement.MassSpecMeasurementDetails.MassSpecMeasurementType'][measurement.mass_spec_details.type]
@@ -219,12 +207,6 @@ def extract_product_measurements(measurements):
             tic_maximum = None
             eic_masses = None
 
-        # selectivity = 14
-        if measurement.selectivity:
-            select_type = enums_data['ProductMeasurement.Selectivity.SelectivityType'][measurement.selectivity.type]
-            selectivity = {select_type:measurement.selectivity.details}
-        else: selectivity = None
-        
         # wavelength = 15
         if measurement.wavelength:
             wavelength = measurement.wavelength.value
@@ -233,11 +215,14 @@ def extract_product_measurements(measurements):
             wavelength = None
             wavelength_unit = None
         
-        measurement_list.append([analysis_key, measurement_type, measurement.details, measurement.uses_internal_standard, 
-            measurement.is_normalized, measurement.uses_authentic_standard, compound_authentic, measurement_value, retention_time, time_unit, 
-            mass_spec_type, mass_spec_details, tic_minimum, tic_maximum, eic_masses,
-            selectivity, wavelength, wavelength_unit])
-        
+        measurement_list.append([index, inchi_key, identifier_list, analysis_key, measurement_type, 
+            measurement.details if measurement.details else None, 
+            measurement.uses_internal_standard if measurement.uses_internal_standard else None, 
+            measurement.is_normalized if measurement.is_normalized else None, 
+            measurement.authentic_standard if measurement.authentic_standard else None, 
+            measurement_value_type, measurement_value, measurement_value_unit, retention_time, time_unit,
+            select_type, wavelength, wavelength_unit])
+
     return measurement_list
 
 def extract_analyses(analyses):

@@ -36,7 +36,7 @@ def extract_reaction_setup(setup, reactionID):
         >>> reaction_setup = extract_reaction_setup(reaction.setup, reactionID='rxn-042')
     """
 
-    vessel = enums_data['Vessel.VesselType'][setup.vessel.type]
+    vessel_type = enums_data['Vessel.VesselType'][setup.vessel.type]
     vessel_material = enums_data['VesselMaterial.VesselMaterialType'][setup.vessel.material.type]
     attach_dict = {} 
     prep_dict = {}
