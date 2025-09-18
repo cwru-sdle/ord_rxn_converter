@@ -30,8 +30,34 @@ dependencies = [
   "rdkit",
 ]
 
+[project.optional-dependencies]
+docs = [
+  "sphinx >= 4.0", 
+  "sphinx-rtd-theme",
+  "sphinx-autodoc-typehints",
+  "myst-parser",
+]
+
+dev = [
+  "pytest",
+  "black",
+  "flake8",
+  "mypy",
+]
+
+# Convenience option to install everything
+all = [
+  "ord_rxn_converter[docs,dev]"
+]
+
+
 [project.urls]
 Homepage = "https://github.com/cwru-sdle/ord_rxn_converter"
+Documentation = "https://ord-rxn-converter.readthedocs.io/"
+Repository = "https://github.com/cwru-sdle/ord_rxn_converter"
+"Bug Tracker" = "https://github.com/cwru-sdle/ord_rxn_converter/issues"
+Changelog = "https://github.com/cwru-sdle/ord_rxn_converter/blob/main/CHANGELOG.md"
+
 
 [build-system]
 requires = ["setuptools", "wheel"]

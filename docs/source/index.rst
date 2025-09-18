@@ -3,16 +3,33 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to ORD Reaction Converter's documentation!
-==================================================
+ORD Reaction Converter
+======================
+
+A Python package for converting Open Reaction Database (ORD) data from Google Protocol Buffer format into structured datasets suitable for machine learning and data analysis.
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: User Guide:
 
    intro
+   installation
+   quickstart
+   examples
+
+.. toctree::
+   :maxdepth: 2
+   :caption: API Reference:
+
+   api
    modules
-   ord_rxn_converter
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Developer Guide:
+
+   contributing
+   changelog
 
 Indices and tables
 ==================
