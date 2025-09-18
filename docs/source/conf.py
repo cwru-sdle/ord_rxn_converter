@@ -15,8 +15,8 @@ sys.path.insert(0, os.path.abspath('../../src'))
 project = 'ORD Reaction Converter'
 copyright = '2025, CWRU-SDLE'
 author = 'Quynh D. Tran, Ethan Tobey, Holly Schreiber, Laura S. Bruckman, Roger H. French'
-release = '0.1.3'  # Updated to match your pyproject.toml
-version = '0.1.3'
+release = '0.1.2'  # Updated to match your pyproject.toml
+version = '0.1.2'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
